@@ -59,3 +59,7 @@ Sales teams can prioritize leads and improve conversion rates using AI insights.
 
 ## Python vs JS
 Here for this project we used JavaScript because this task was relatively simpler and therefore Python was not used as n8n is a JavaScript-based automation tool, making JavaScript more suitable for seamless integration and faster workflow execution.
+
+##Scalability
+
+For handling high-volume lead data, the system can be enhanced with a SQL database to enable structured storage, optimized querying, and improved performance in production environments. In order to keep it simple, according to the task requirements, we have kept this project simple and efficient. The generated output file, as google sheet can be more preferred  by the sales team in order to easily access and approach the leads. 
