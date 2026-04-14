@@ -1,0 +1,268 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1dsp7ui_2Qs7rYQUMkLfqcnfplgHsbUPEtlB7FV0bOcI",
+          "mode": "list",
+          "cachedResultName": "leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dsp7ui_2Qs7rYQUMkLfqcnfplgHsbUPEtlB7FV0bOcI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 48501416,
+          "mode": "list",
+          "cachedResultName": "leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1dsp7ui_2Qs7rYQUMkLfqcnfplgHsbUPEtlB7FV0bOcI/edit#gid=48501416"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        0
+      ],
+      "id": "7f339e10-e6cc-402e-aecc-7633c6958592",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZcSfmRAEnuBGirTn",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=You are a sales assistant AI.\n\nAnalyze the following lead:\n\nName: {{$json[\"Name\"]}}\nCompany: {{$json[\"Company Name\"]}}\nJob Title: {{$json[\"Job Title\"]}}\nMessage: {{$json[\"Message\"]}}\n\nScoring rules:\n- Senior roles (CEO, CTO, Founder, Director) → +30 points\n- Mid-level roles (Manager, Lead) → +20 points\n- Junior roles → +10 points\n\n- Clear business problem mentioned → +30 points\n- Vague interest → +10 points\n\n- Industry relevance to AI/tech → +20 points\n\n- Random or unclear message → score below 40\n\nReturn ONLY valid JSON:\n\n{\n  \"name\": \"\",\n  \"company\": \"\",\n  \"lead_score\": number (0-100),\n  \"industry\": \"\",\n  \"business_need\": \"\",\n  \"recommended_action\": \"\"\n}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        256,
+        0
+      ],
+      "id": "aee8cffc-2a16-430f-bc18-2d967e2048cd",
+      "name": "Message a model",
+      "alwaysOutputData": false,
+      "credentials": {
+        "openAiApi": {
+          "id": "wFfoP4nb9buPrGy7",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const raw = $json.output[0].content[0].text;\n\nconst clean = raw.replace(/```json|```/g, '').trim();\n\nconst parsed = JSON.parse(clean);\n\nreturn {\n  Name: parsed.name,\n  Company: parsed.company,\n  LeadScore: parsed.lead_score,\n  Industry: parsed.industry,\n  BusinessNeed: parsed.business_need,\n  Action: parsed.recommended_action\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "7745ac35-b523-403d-840c-82301b650512",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1mCcKfE0Vkzufmi5C6ce8XXiQFUKrdtdI8Zv34juZ3XM",
+          "mode": "list",
+          "cachedResultName": "AI Lead Results",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mCcKfE0Vkzufmi5C6ce8XXiQFUKrdtdI8Zv34juZ3XM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1mCcKfE0Vkzufmi5C6ce8XXiQFUKrdtdI8Zv34juZ3XM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{$json[\"Name\"]}}",
+            "Company": "={{$json[\"Company\"]}}",
+            "LeadScore": "={{$json[\"LeadScore\"]}}",
+            "Industry": "={{$json[\"Industry\"]}}",
+            "Business Need": "={{$json[\"BusinessNeed\"]}}",
+            "Action": "={{$json[\"Action\"]}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LeadScore",
+              "displayName": "LeadScore",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Business Need",
+              "displayName": "Business Need",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Action",
+              "displayName": "Action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        864,
+        0
+      ],
+      "id": "a8c4df05-a567-4ae0-9fa4-57ab13002d10",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZcSfmRAEnuBGirTn",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "d0dafbd6-6a83-47be-b07e-46bbba476e35",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "2973cafc-881c-43a6-8fd0-abe065637d0f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1634ac5cde5ce00454828c804d0e587d6293510abc57af3203b328c3d0838670"
+  },
+  "id": "yJt3TxMUof4YAh5k",
+  "tags": []
+}
